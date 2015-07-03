@@ -19,7 +19,7 @@ while [ "$1" != "" ]; do
             echo "./wifi-testmode.sh"
             echo "\t-h --help"
             echo "\t--channel=${CHANNEL}\t(1..14)"
-            echo "\t--duration=${DURATION}\t(0=continuous, 1>=duration in seconds)"
+            echo "\t--duration=${DURATION}\t(0 is continuous, >=1 is duration in seconds)"
             echo "\t--mode=${MODE}\t(b,g,n)"
             echo "\t--power=${POWER}\t(quarter dB values)"
             exit
