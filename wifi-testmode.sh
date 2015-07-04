@@ -4,6 +4,7 @@ CHANNEL=1
 DURATION=10
 MODE="b"
 POWER=69
+STATE="tx"
  
 while [ "$1" != "" ]; do
     PARAM=$(echo "${1}" | awk -F= '{print $1}')
@@ -22,6 +23,7 @@ while [ "$1" != "" ]; do
             echo "\t--duration=${DURATION}\t(0 is continuous, >=1 is duration in seconds)"
             echo "\t--mode=${MODE}\t(b,g,n)"
             echo "\t--power=${POWER}\t(quarter dB values)"
+            echo "\t--state=${STATE}\t(tx,rx)"
             exit
             ;;
         --channel)
@@ -35,6 +37,9 @@ while [ "$1" != "" ]; do
             ;;
         --power)
             POWER="${VALUE}"
+            ;;
+        --state)
+            STATE="${VALUE}"
             ;;
         *)
             echo "ERROR: unknown parameter \"$PARAM\""
@@ -50,6 +55,7 @@ while [ "$1" != "" ]; do
             echo "\t--duration=${DURATION}\t(0 is continuous, >=1 is duration in seconds)"
             echo "\t--mode=${MODE}\t(b,g,n)"
             echo "\t--power=${POWER}\t(quarter dB)"
+            echo "\t--state=${STATE}\t(tx,rx)"
             exit 1
             ;;
     esac
@@ -153,8 +159,13 @@ wllinuxarm -a wlan0 --nl80211 interference 0
 echo "Turning off interference mitigation"
 
 # The MAC Address in the docs was 00:11:22:33:44:55
-echo "Beginning packet transmission"
-wllinuxarm -a wlan0 --nl80211 pkteng_start 00:00:00:c0:ff:ee tx 100 1024 0
+if [ "${STATE}" = "tx" ]
+then
+    echo "Beginning packet transmission"
+    wllinuxarm -a wlan0 --nl80211 pkteng_start 00:00:00:c0:ff:ee tx 100 1024 0
+else
+    echo "Beginning packet reception"
+    wllinuxarm -a wlan0 --nl80211 pkteng_start 00:90:4c:c5:34:23 rx
 
 if [ "${DURATION}" -gt 0 ];
 then
@@ -162,7 +173,13 @@ then
     sleep $DURATION
     
     echo "Stopping packet transmission"
-    wllinuxarm -a wlan0 --nl80211 pkteng_stop tx
+    
+    if [ "${STATE}" = "tx" ]
+    then
+        wllinuxarm -a wlan0 --nl80211 pkteng_stop tx
+    else
+        wllinuxarm -a wlan0 --nl80211 pkteng_stop rx
+    fi
 else
-    echo "Continuous transmission, stop with 'wllinuxarm -a wlan0 --nl80211 pkteng_stop tx'"
+    echo "Continuous transmission, stop with 'wllinuxarm -a wlan0 --nl80211 pkteng_stop (tx|rx)'"
 fi
