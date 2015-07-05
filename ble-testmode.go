@@ -17,12 +17,12 @@ var stop bool
 
 func main(){
     // Parse CLI arguments
-    flag.UintVar(&channel,      "channel",  0, "Transmission channel (1..79)")
-    flag.DurationVar(&duration, "duration", (time.Second * time.Duration(10)), "Transmission duration (0 is continuous, >=1 is duration in seconds)")
-    flag.StringVar(&state,      "state",    "tx", "Are we transmitting or receiving? (tx | rx)")
+    flag.UintVar(&channel,      "channel",  0, "(1..79)")
+    flag.DurationVar(&duration, "duration", (time.Second * time.Duration(10)), "(0 is continuous, >=1 is duration in seconds)")
+    flag.StringVar(&state,      "state",    "tx", "(tx | rx)")
     flag.UintVar(&length,       "length",   0, "Length of the test data")
     flag.UintVar(&payload,      "payload",  0x00, "Packet payload")
-    flag.BoolVar(&stop,         "stop",     false, "If a test was started without a duration of zero, issue this command to halt it")
+    flag.BoolVar(&stop,         "stop",     false, "Halt test if is duration=0")
     flag.Parse()
     
     log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
