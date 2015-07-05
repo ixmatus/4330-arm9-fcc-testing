@@ -48,6 +48,10 @@ Usage of ./ble-testmode:
   -stop=false: If a test was started without a duration of zero, issue this command to halt it
 ```
 
+To build the BLE Test Mode go program you will likely need whatever compiler toolchain is necessary for the
+environment this program will run on. In our case it's an ARM9, I had to cross-compile the go compiler and
+specify that when building, please refer to the `Makefile` for some hints.
+
 ## Broadcom 4330 Firmware note
 The Broadcom 4330 is a dynamically programmed chip, you have to download firmware to it. None of the test commands in this repository will work if you are providing the production version of the 4330's binary image to the kernel driver. *You must have the manufacturer binary firmware image* to load onto the chip in order for any of the `wl` utility test-mode commands to work.
 
