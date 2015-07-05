@@ -11,7 +11,7 @@ while [ "$1" != "" ]; do
     VALUE=$(echo "${1}" | awk -F= '{print $2}')
     case "${PARAM}" in
         -h | --help)
-            echo "BCM4330 intentional transmission testing"
+            echo "BCM4330 intentional Wi-Fi transmission testing"
             echo ""
             echo "NOTE: the manufacturer binary image must be downloaded onto the 4330"
             echo "in order for any of these commands to work! The 4330 also does not"
