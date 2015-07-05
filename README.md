@@ -40,12 +40,12 @@ you have to do for FCC testing with your vendor.
 ```
 » ./ble-testmode --help
 Usage of ./ble-testmode:
-  -channel=0: Transmission channel (1..79)
-  -duration=10s: Transmission duration (0 is continuous, >=1 is duration in seconds)
+  -channel=0: (1..79)
+  -duration=10s: (0 is continuous, >=1 is duration in seconds)
   -length=0: Length of the test data
   -payload=0: Packet payload
-  -state="tx": Are we transmitting or receiving? (tx | rx)
-  -stop=false: If a test was started without a duration of zero, issue this command to halt it
+  -state="tx": (tx | rx)
+  -stop=false: Halt test if is duration=0
 ```
 
 To build the BLE Test Mode go program you will likely need whatever compiler toolchain is necessary for the
