@@ -5,6 +5,10 @@ DURATION=10
 MODE="b"
 POWER=69
 STATE="tx"
+STOP=0
+BGRATE=1
+NRATE=0
+WORST=0
  
 while [ "$1" != "" ]; do
     PARAM=$(echo "${1}" | awk -F= '{print $1}')
@@ -17,13 +21,30 @@ while [ "$1" != "" ]; do
             echo "in order for any of these commands to work! The 4330 also does not"
             echo "support MIMO mode so no MIMO commands are issued in this script."
             echo ""
+            echo "MODE & RATE"
+            echo "The mode you've selected is also largely dependent on the rate"
+            echo "you select. If you select '--mode=b' but set '--bgrate=9' the"
+            echo "chip will actually be in \"g mode\". However, if '--mode=n' you"
+            echo "must use the '--nrate' switch."
+            echo ""
+            echo "WORST CASE"
+            echo "Setting the worst-case switch to 1 will use the worst-case rates"
+            echo "for regulatory which actually use a legacy modulation."
+            echo ""
             echo "Usage of ./wifi-testmode.sh"
-            echo "\t-h --help"
-            echo "\t--channel=${CHANNEL}\t(1..14)"
-            echo "\t--duration=${DURATION}\t(0 is continuous, >=1 is duration in seconds)"
-            echo "\t--mode=${MODE}\t(b,g,n)"
-            echo "\t--power=${POWER}\t(quarter dB values)"
-            echo "\t--state=${STATE}\t(tx,rx)"
+            echo "    -h --help"
+            echo "    --channel=${CHANNEL}       (1..14)"
+            echo "    --duration=${DURATION}     (0 is continuous, >=1 is duration in seconds)"
+            echo "    --mode=${MODE}          (b,g,n)"
+            echo "    --bgrate=${BGRATE}"
+            echo "        Valid values for b: 1, 2, 5.5, and 11"
+            echo "        Valid values for g: 1, 2, 5.5, 6, 9, 11, 12, 18, 24, 36, 48, and 54"
+            echo "        -1 to automatically determine the best rate"
+            echo "    --nrate=${NRATE}         (0..7)"
+            echo "    --worst-case=${WORST}    (0,1)"
+            echo "    --power=${POWER}        (quarter dB values)"
+            echo "    --state=${STATE}        (tx,rx)"
+            echo "    --stop=           (tx,rx)"
             exit
             ;;
         --channel)
@@ -35,32 +56,70 @@ while [ "$1" != "" ]; do
         --mode)
             MODE="${VALUE}"
             ;;
+        --bgrate)
+            BGRATE="${VALUE}"
+            ;;
+        --nrate)
+            NRATE="${VALUE}"
+            ;;
+        --worst-case)
+            WORST="${VALUE}"
+            ;;
         --power)
             POWER="${VALUE}"
             ;;
         --state)
             STATE="${VALUE}"
             ;;
+        --stop)
+            STOP="${VALUE}"
+            ;;
         *)
-            echo "ERROR: unknown parameter \"$PARAM\""
-            echo "BCM4330 intentional transmission testing"
+            echo "BCM4330 intentional Wi-Fi transmission testing"
             echo ""
             echo "NOTE: the manufacturer binary image must be downloaded onto the 4330"
             echo "in order for any of these commands to work! The 4330 also does not"
             echo "support MIMO mode so no MIMO commands are issued in this script."
             echo ""
+            echo "MODE & RATE"
+            echo "The mode you've selected is also largely dependent on the rate"
+            echo "you select. If you select '--mode=b' but set '--bgrate=9' the"
+            echo "chip will actually be in \"g mode\". However, if '--mode=n' you"
+            echo "must use the '--nrate' switch."
+            echo ""
+            echo "WORST CASE"
+            echo "Setting the worst-case switch to 1 will use the worst-case rates"
+            echo "for regulatory which actually use a legacy modulation."
+            echo ""
             echo "Usage of ./wifi-testmode.sh"
-            echo "\t-h --help"
-            echo "\t--channel=${CHANNEL}\t(1..14)"
-            echo "\t--duration=${DURATION}\t(0 is continuous, >=1 is duration in seconds)"
-            echo "\t--mode=${MODE}\t(b,g,n)"
-            echo "\t--power=${POWER}\t(quarter dB)"
-            echo "\t--state=${STATE}\t(tx,rx)"
+            echo "    -h --help"
+            echo "    --channel=${CHANNEL}    (1..14)"
+            echo "    --duration=${DURATION} (0 is continuous, >=1 is duration in seconds)"
+            echo "    --mode=${MODE}        (b,g,n)"
+            echo "    --bgrate=${BGRATE}"
+            echo "        Valid values for b: 1, 2, 5.5, and 11"
+            echo "        Valid values for g: 1, 2, 5.5, 6, 9, 11, 12, 18, 24, 36, 48, and 54"
+            echo "        -1 to automatically determine the best rate"
+            echo "    --nrate=${NRATE}        (0..7)"
+            echo "    --worst-case=${WORST}    (0,1)"
+            echo "    --power=${POWER}      (quarter dB values)"
+            echo "    --state=${STATE}  (tx,rx)"
+            echo "    --stop=           (tx,rx)"
             exit 1
             ;;
     esac
     shift
 done
+
+if [ "${STOP}" = "tx" ]
+then
+    wllinuxarm -a wlan0 --nl80211 pkteng_stop tx
+fi
+
+if [ "${STOP}" = "rx" ]
+then
+    wllinuxarm -a wlan0 --nl80211 pkteng_stop rx
+fi
 
 # Initialize, chip must be down when we are configuring it
 wllinuxarm -a wlan0 --nl80211 out
@@ -114,16 +173,28 @@ echo "Turning frameburst on"
 
 if [ "${MODE}" = "b" ]
 then
-    wllinuxarm -a wlan0 --nl80211 nrate -r 1 -s 0
-    echo "Setting legacy modulation to cck and stf_mode to SISO with a rate of 1mbps ('b' in b/g/n)"
+    if [ "${WORST}" -eq 1 ]
+    then
+        wllinuxarm -a wlan0 --nl80211 nrate -r 1 -s 0
+        echo "Setting legacy modulation to cck and stf_mode to SISO with a rate of 1mbps ('b' in b/g/n)"
+    else
+        wllinuxarm -a wlan0 --nl80211 bg_rate "${BGRATE}"
+        echo "Setting bgrate to ${BGRATE}"
+    fi
 elif [ "${MODE}" = "g" ]
 then
-    wllinuxarm -a wlan0 --nl80211 nrate -r 6 -s 0
-    echo "Setting legacy modulation to cck and stf_mode to SISO with a rate of 6mbps ('g' in b/g/n)"
+    if [ "${WORST}" -eq 1 ]
+    then
+        wllinuxarm -a wlan0 --nl80211 nrate -r 6 -s 0
+        echo "Setting legacy modulation to cck and stf_mode to SISO with a rate of 6mbps ('g' in b/g/n)"
+    else
+        wllinuxarm -a wlan0 --nl80211 bg_rate "${BGRATE}"
+        echo "Setting bgrate to ${BGRATE}"
+    fi
 elif [ "${MODE}" = "n" ]
 then
-    wllinuxarm -a wlan0 --nl80211 nrate -m 0 -s 0
-    echo "Setting mimo index to 0 and stf_mode to SISO in conjunction with nmode ON"
+    wllinuxarm -a wlan0 --nl80211 nrate -m "${NRATE}" -s 0
+    echo "Setting mimo index to ${NRATE} and stf_mode to SISO in conjunction with nmode ON"
 fi
 
 wllinuxarm -a wlan0 --nl80211 down
@@ -166,11 +237,12 @@ then
 else
     echo "Beginning packet reception"
     wllinuxarm -a wlan0 --nl80211 pkteng_start 00:90:4c:c5:34:23 rx
+fi
 
 if [ "${DURATION}" -gt 0 ];
 then
     echo "Waiting for ${DURATION}s"
-    sleep $DURATION
+    sleep "${DURATION}"
     
     echo "Stopping packet transmission"
     
@@ -181,5 +253,5 @@ then
         wllinuxarm -a wlan0 --nl80211 pkteng_stop rx
     fi
 else
-    echo "Continuous transmission, stop with 'wllinuxarm -a wlan0 --nl80211 pkteng_stop (tx|rx)'"
+    echo "Continuous transmission, stop with 'wifi-testmode.sh --stop=(tx,rx)'"
 fi
