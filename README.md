@@ -32,25 +32,24 @@ Usage of ./wifi-testmode.sh
 ```
 
 ## BLE Test Mode
-The Golang program also in this repository will configure and activate the 4330 chip to test reception and transmission for United States regulatory test requirements.
-
-Only use these as a reference (I slogged through this), you should definitely be double checking anything
-you have to do for FCC testing with your vendor.
 
 ```
-» ./ble-testmode --help
-Usage of ./ble-testmode:
-  -channel=0: (1..79)
-  -duration=10s: (0 is continuous, >=1 is duration in seconds)
-  -length=0: Length of the test data
-  -payload=0: Packet payload
-  -state="tx": (tx | rx)
-  -stop=false: Halt test if is duration=0
+BCM4330 intentional Bluetooth transmission testing
+
+NOTE: this is using testing modulated signals which only allow even
+numbered channels. Please see the README.md for notes on testing
+for carrier only continuous wave.
+
+Usage of ./bt-testmode.sh
+    -h --help
+    --channel=0       (0..39)
+    --duration=10     (0 is continuous, >=1 is duration in seconds)
+    --stop
 ```
 
-To build the BLE Test Mode go program you will likely need whatever compiler toolchain is necessary for the
-environment this program will run on. In our case it's an ARM9, I had to cross-compile the go compiler and
-specify that when building, please refer to the `Makefile` for some hints.
+~~The Golang program also in this repository will configure and activate the 4330 chip to test reception and
+transmission for United States regulatory test requirements.~~ I've moved over to a shell script that issues
+the HCITool commands directly instead of requiring the Golang library and stack.
 
 ## Broadcom 4330 Firmware note
 The Broadcom 4330 is a dynamically programmed chip, you have to download firmware to it. None of the test commands in this repository will work if you are providing the production version of the 4330's binary image to the kernel driver. *You must have the manufacturer binary firmware image* to load onto the chip in order for any of the `wl` utility test-mode commands to work.

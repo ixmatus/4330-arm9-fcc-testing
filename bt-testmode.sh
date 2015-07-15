@@ -11,9 +11,13 @@ while [ "$1" != "" ]; do
         -h | --help)
             echo "BCM4330 intentional Bluetooth transmission testing"
             echo ""
+            echo "NOTE: this is using testing modulated signals which only allow even"
+            echo "numbered channels. Please see the README.md for notes on testing"
+            echo "for carrier only continuous wave."
+            echo ""
             echo "Usage of ./bt-testmode.sh"
             echo "    -h --help"
-            echo "    --channel=${CHANNEL}       (0..78)"
+            echo "    --channel=${CHANNEL}       (0..39)"
             echo "    --duration=${DURATION}     (0 is continuous, >=1 is duration in seconds)"
             echo "    --stop"
             exit
@@ -30,9 +34,13 @@ while [ "$1" != "" ]; do
         *)
             echo "BCM4330 intentional Bluetooth transmission testing"
             echo ""
+            echo "NOTE: this is using testing modulated signals which only allow even"
+            echo "numbered channels. Please see the README.md for notes on testing"
+            echo "for carrier only continuous wave."
+            echo ""
             echo "Usage of ./bt-testmode.sh"
             echo "    -h --help"
-            echo "    --channel=${CHANNEL}       (0..78)"
+            echo "    --channel=${CHANNEL}       (0..39)"
             echo "    --duration=${DURATION}     (0 is continuous, >=1 is duration in seconds)"
             echo "    --stop"
             exit 1
@@ -52,6 +60,11 @@ hciconfig hci0 reset
 hciconfig hci0 noauth
 hciconfig hci0 noencrypt
 hciconfig hci0 noscan
+
+# NOTE: 0x08 is the control code for issuing LE contextual commands,
+# 0X3F is the contextual command for vendor specific commands. Low
+# Energy is the standard set of commands the chip needs to support in
+# its API.
 
 hcitool cmd 0x08 0x001e "${CHANNEL}" 0 0
 
