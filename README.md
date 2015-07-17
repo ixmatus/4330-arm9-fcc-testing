@@ -57,6 +57,15 @@ Usage of ./wifi-testmode.sh
         --state=tx      (tx,rx)
 ```
 
+### Broadcom 4330 Firmware note
+The Broadcom 4330 is a dynamically programmed chip, you have to download firmware to it. Disabling of the
+automatic power management will not work (but required to work for FCC) if you are providing the production
+version of the 4330's binary image to the brcmfmac kernel driver. *You must have the manufacturer binary
+firmware image* to load onto the chip in order for the `wl` utility power management commands to work.
+
+### Building `wl` for Linux ARM9
+This required a combination of a custom package provided to us from our vendor and linking in the netlink 80211 library. You of course need an entire cross-compiler toolchain, you're on your own there.
+
 ## BLE Test Mode
 
 ```
@@ -101,9 +110,3 @@ The setup for the client after the server is running.
 ### Carrier only continuous wave
 Note, we did biology experiments and discovered this command: `hcitool cmd 0x3f 0x14` it turns on the radio,
 at a randomly selected channel for *Bluetooth Classic only*, it may be of interest to someone.
-
-## Broadcom 4330 Firmware note
-The Broadcom 4330 is a dynamically programmed chip, you have to download firmware to it. None of the test commands in this repository will work if you are providing the production version of the 4330's binary image to the kernel driver. *You must have the manufacturer binary firmware image* to load onto the chip in order for any of the `wl` utility test-mode commands to work.
-
-## Building `wl` for Linux ARM9
-This required a combination of a custom package provided to us from our vendor and linking in the netlink 80211 library. You of course need an entire cross-compiler toolchain, you're on your own there.
