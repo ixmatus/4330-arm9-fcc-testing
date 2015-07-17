@@ -49,7 +49,7 @@ while [ "$1" != "" ]; do
     shift
 done
 
-if [ "${STOP}" = "tx" ]
+if [ "${STOP}" -eq 1 ]
 then
     echo "Stopping transmission manually"
     hcitool cmd 0x08 0x001f
