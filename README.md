@@ -28,7 +28,8 @@ One hurdle for Plum: we needed to demonstrate the Adaptive Frequency Hopping mec
 
 I put the server on one device and the client on the other, started them both up, then used `autokey` for
 Ubuntu to write a `notify ...` message to the interactive GATT server prompt on the device running
-`btgatt-server`. That autokey script is in this repository. This solution successfully demonstrated the AFH.
+`btgatt-server`. That autokey script is in this repository. This solution successfully demonstrated the AFH
+for Bluetooth Low Energy (hopping on 2MHz channels with a channel space of 40).
 
 ## WiFi Test Mode
 The shell script `wifi-testmode.sh` will configure and activate the 4330 chip for the recommended United
