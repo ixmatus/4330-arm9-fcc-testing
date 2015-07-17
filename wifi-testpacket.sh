@@ -1,5 +1,9 @@
 #!/bin/sh
- 
+
+# This script was used in order to demonstrate our "duty cycle". You
+# must figure out what your duty cycle is then decide how you will
+# represent it. In our case, the most common packet size is 200 bytes.
+
 CHANNEL=4
 POWER=69
 PACKET=200
