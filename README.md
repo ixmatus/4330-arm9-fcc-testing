@@ -19,9 +19,10 @@ Bluetooth is another beast and as of the time of this writing (07/17/2015) we we
 intentional transmission, at full-power, for selected channels. Broadcom has no tools, nor documentation for
 the HCI hex commands, to perform these tests in a Linux ARM9 environment for Bluetooth Classic.
 
-What Plum was able to pass for was Bluetooth Low Energy. The test commands for intentional
-transmission on a selected channel within the 40 channels for BLE worked well (they are what compose the ble
-shell scripts in this repository).
+What Plum was capable of passing was Bluetooth Low Energy. The test commands for intentional transmission on
+a selected channel within the 40 channels for BLE worked well (they are what compose the ble shell scripts
+in this repository). This worked out well for Plum because our product only uses BLE and we turn off
+Bluetooth Classic.
 
 One hurdle for Plum: we needed to demonstrate the Adaptive Frequency Hopping mechanism of the chip. I originally solved this by using `SDP` and `rfcomm` to setup a pipe between two devices then `cat` a file or something big over the pipe, which worked but it demonstrated it for Bluetooth Classic. To demonstrate AFH for Low Energy I had to get creative and cross-compile the `btgatt-server` and `btgatt-client` from the `bluez` linux package.
 
