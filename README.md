@@ -51,6 +51,28 @@ Usage of ./bt-testmode.sh
 transmission for United States regulatory test requirements.~~ I've moved over to a shell script that issues
 the HCITool commands directly instead of requiring the Golang library and stack.
 
+### Setting up the btgatt-server and btgatt-client
+
+This is the setup for the server side...
+
+```
+btmgmt -i hci0 power off 
+btmgmt -i hci0 le on
+btmgmt -i hci0 connectable on
+btmgmt -i hci0 bredr off        # Disables BR/EDR !
+btmgmt -i hci0 advertising on
+btmgmt -i hci0 power on
+
+btgatt-server -i hci0 -s low
+```
+
+This the setup for the client after the server is running.
+
+`btgatt-client -i hci0 -d 00:01:A2:03:04:06 -s low -v`
+
+### Carrier only continuous wave
+Note, we did biology experiments and discovered this command: `hcitool cmd 0x3f 0x14` it turns on the radio, at a randomly selected channel.
+
 ## Broadcom 4330 Firmware note
 The Broadcom 4330 is a dynamically programmed chip, you have to download firmware to it. None of the test commands in this repository will work if you are providing the production version of the 4330's binary image to the kernel driver. *You must have the manufacturer binary firmware image* to load onto the chip in order for any of the `wl` utility test-mode commands to work.
 

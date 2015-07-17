@@ -1,3 +1,6 @@
+# NOTE: btmgmt and btgatt-server is part of the bluez package and
+# needs to be cross-compiled for the ARM9
+
 killall -9 beam.smp
 killall -9 wpa_supplicant
 killall -9 udhcpc
